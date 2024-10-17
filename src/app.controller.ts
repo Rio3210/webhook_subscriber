@@ -8,12 +8,7 @@ export class AppController {
 
   @Post('/hello')
   // @UseGuards(AuthGuard)
-  @UseGuards(
-    secretTokenGuard(
-      'aladia-100ms-header',
-      'vGJKxrlz2fsJsleP4RHFpar1StCJ0yTm4he3Xb3u',
-    ),
-  )
+  @UseGuards(secretTokenGuard('aladia-100ms-header', 'salakute'))
   getHello(@Body() body: any, @Headers('authorization') auth: string): string {
     console.log('Received a webhook from Aladia');
     console.log(body, 'body');
