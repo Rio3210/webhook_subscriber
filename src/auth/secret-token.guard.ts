@@ -24,7 +24,7 @@ export class SecretTokenGuard implements CanActivate {
       );
     }
 
-    const secret = 'surakute';
+    const secret = 'salakute';
 
     if (!secret) {
       throw new UnauthorizedException(`Missing secret: ${this.secretName}`);
@@ -43,26 +43,18 @@ export class SecretTokenGuard implements CanActivate {
     payload: any,
     secret: string,
   ): void {
-    // Compute HMAC of the payload
-    const hmac = createHmac('sha1', secret);
-    hmac.update(
-      typeof payload === 'string' ? payload : JSON.stringify(payload),
-    );
-    const expectedSignature = `sha1=${hmac.digest('hex')}`;
+    const hmac = createHmac('sha256', secret);
 
-    const expectedBuffer = Buffer.from(expectedSignature);
+    hmac.update(payload);
+    const generatedHmac = hmac.digest('hex');
+
+    const expectedBuffer = Buffer.from(generatedHmac);
     const signatureBuffer = Buffer.from(signature);
 
-    // Check if the lengths match first (safe comparison)
-    if (expectedBuffer.length !== signatureBuffer.length) {
-      throw new UnauthorizedException(
-        'Invalid HMAC signature (length mismatch).',
-      );
-    }
-
-    // Perform timing safe comparison
     if (!timingSafeEqual(expectedBuffer, signatureBuffer)) {
       throw new UnauthorizedException('Invalid HMAC signature.');
     }
+
+    console.log('Signature is valid');
   }
 }
